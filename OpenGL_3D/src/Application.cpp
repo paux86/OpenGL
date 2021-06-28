@@ -55,8 +55,8 @@ int main(void)
 
 		Renderer::Init();
 
-		GLuint texture1 = Texture("res/textures/hero_dash_icon.png").GetId();
-		GLuint texture2 = Texture("res/textures/shield_with_cross_icon.png").GetId();
+		Texture texture1("res/textures/hero_dash_icon.png");
+		Texture texture2("res/textures/shield_with_cross_icon.png");
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
@@ -72,12 +72,13 @@ int main(void)
 			Renderer::ResetStats();
 			Renderer::BeginBatch();
 
+			float scale = 50.0f;
 			for (float y = -10.f; y < 10.0f; y += 0.25f)
 			{
 				for (float x = -10.f; x < 10.0f; x += 0.25f)
 				{
 					glm::vec4 color = { (x + 10) / 20.0f, 0.2f, (y + 10) / 20.0f, 1.0f };
-					Renderer::DrawQuad({ x, y }, { 0.25f, 0.25f }, color);
+					Renderer::DrawQuad({ x*scale, y*scale }, { 0.25f*scale, 0.25f*scale }, color);
 				}
 			}
 
@@ -85,8 +86,8 @@ int main(void)
 			{
 				for (int x = 0; x < 5; x++)
 				{
-					GLuint tex = (x + y) % 2 == 0 ? texture1 : texture2;
-					Renderer::DrawQuad({ x, y }, { 1.0f, 1.0f }, tex);
+					GLuint tex = (x + y) % 2 == 0 ? texture1.GetId() : texture2.GetId();
+					Renderer::DrawQuad({ x*scale, y*scale }, { 1.0f*scale, 1.0f*scale }, tex);
 				}
 			}
 

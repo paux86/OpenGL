@@ -51,13 +51,13 @@ void Renderer::Init()
 	glEnableVertexArrayAttrib(s_Data.QuadVA, 0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, Position));
 
-	glEnableVertexArrayAttrib(s_Data.QuadVA, 0);
+	glEnableVertexArrayAttrib(s_Data.QuadVA, 1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, Color));
 
-	glEnableVertexArrayAttrib(s_Data.QuadVA, 0);
+	glEnableVertexArrayAttrib(s_Data.QuadVA, 2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, TexCoords));
 
-	glEnableVertexArrayAttrib(s_Data.QuadVA, 0);
+	glEnableVertexArrayAttrib(s_Data.QuadVA, 3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, TexIndex));
 
 	uint32_t indices[MaxIndexCount];
