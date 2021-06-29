@@ -10,6 +10,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -55,19 +58,34 @@ int main(void)
 
 		Renderer::Init();
 
+		ImGui::CreateContext();
+		ImGui_ImplGlfwGL3_Init(window, true);
+		ImGui::StyleColorsDark();
+
 		Texture texture1("res/textures/hero_dash_icon.png");
 		Texture texture2("res/textures/shield_with_cross_icon.png");
+
+		float zoom = 0.0f;
+		glm::vec3 translation(0, 0, 0);
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
 		{
 			/* Render here */
 			glClear(GL_COLOR_BUFFER_BIT);
+			ImGui_ImplGlfwGL3_NewFrame();
+			ImGui::Begin("Test");
+
 			shader.Bind();
-			glm::mat4 viewProj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f) * glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-			glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+			//glm::mat4 viewProj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f) * glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+			ImGui::SliderFloat("Zoom", &zoom, 0.0f, 200.0f);
+			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
+
+			glm::mat4 viewProj = glm::ortho(0.0f + zoom, 960.0f - zoom, 0.0f + (zoom * 540.0f / 960.0f), 540.0f - (zoom * 540.0f / 960.0f), -1.0f, 1.0f);
+			glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation);
 			shader.SetUniformMat4f("u_ViewProj", viewProj);
 			shader.SetUniformMat4f("u_Transform", transform);
+
 
 			Renderer::ResetStats();
 			Renderer::BeginBatch();
@@ -92,8 +110,11 @@ int main(void)
 			}
 
 			Renderer::EndBatch();
-
 			Renderer::Flush();
+
+			ImGui::End();
+			ImGui::Render();
+			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
 			/* Swap front and back buffers */
 			glfwSwapBuffers(window);
@@ -104,6 +125,8 @@ int main(void)
 		
 		Renderer::Shutdown();
 	}
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
 	glfwTerminate();
 	return 0;
 }
