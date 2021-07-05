@@ -77,12 +77,21 @@ int main(void)
 			ImGui::Begin("Test");
 
 			shader.Bind();
-			//glm::mat4 viewProj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f) * glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+			
 			ImGui::SliderFloat("Zoom", &zoom, 0.0f, 200.0f);
-			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
+			ImGui::SliderFloat3("Translation", &translation.x, -1000.0f, 1000.0f);
 
-			glm::mat4 viewProj = glm::ortho(0.0f + zoom, 960.0f - zoom, 0.0f + (zoom * 540.0f / 960.0f), 540.0f - (zoom * 540.0f / 960.0f), -1.0f, 1.0f);
-			glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation);
+			bool ortho = false;
+			glm::mat4 viewProj, transform;
+			if (ortho)
+			{
+				viewProj = glm::ortho(0.0f + zoom, 960.0f - zoom, 0.0f + (zoom * 540.0f / 960.0f), 540.0f - (zoom * 540.0f / 960.0f), -1.0f, 1.0f);
+				transform = glm::translate(glm::mat4(1.0f), translation);
+			}
+			else {
+				viewProj = glm::perspectiveFov(90.0f, 960.0f, 540.0f, 0.1f, 1000.0f);
+				transform = glm::translate(glm::mat4(1.0f), translation + glm::vec3(0,0,-150));
+			}
 			shader.SetUniformMat4f("u_ViewProj", viewProj);
 			shader.SetUniformMat4f("u_Transform", transform);
 
@@ -90,6 +99,7 @@ int main(void)
 			Renderer::ResetStats();
 			Renderer::BeginBatch();
 
+			/*
 			float scale = 50.0f;
 			for (float y = -10.f; y < 10.0f; y += 0.25f)
 			{
@@ -108,6 +118,13 @@ int main(void)
 					Renderer::DrawQuad({ x*scale, y*scale }, { 1.0f*scale, 1.0f*scale }, tex);
 				}
 			}
+			*/
+
+			glm::vec3 boxPosition = { 0, 0, 0 };
+			glm::vec3 boxDimensions = { 50, 50, 50 };
+			glm::vec4 boxColor = { 0.1f, 0.2f, 0.8f, 1.0f };
+			glm::vec3 boxFacing = { 1, 1, 1 };
+			Renderer::DrawBox(boxPosition, boxDimensions, boxColor, boxFacing);
 
 			Renderer::EndBatch();
 			Renderer::Flush();
