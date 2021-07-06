@@ -246,7 +246,7 @@ void Renderer::DrawBox(const glm::vec3& position, const glm::vec3& size, const g
 	//facing should already be normalized
 	glm::vec3 v_facing_norm = glm::normalize(facing);
 	glm::vec3 v_up = { 0,1,0 };
-	glm::vec3 v_right = glm::normalize(glm::cross(v_facing_norm, v_up));
+	glm::vec3 v_right = glm::normalize(glm::cross(v_up, v_facing_norm));
 	v_up = glm::normalize(glm::cross(v_facing_norm, v_right));
 
 	glm::vec3 frontBottomLeftPosition = position + (v_facing_norm * size.x * 0.5f) - (v_right * size.y * 0.5f) - (v_up * size.z * 0.5f);

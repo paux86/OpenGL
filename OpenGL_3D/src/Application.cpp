@@ -69,7 +69,7 @@ int main(void)
 		Texture texture2("res/textures/shield_with_cross_icon.png");
 
 		float zoom = 0.0f;
-		glm::vec3 translation(0, 0, 0);
+		glm::vec3 camera(0, 0, 0);
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
@@ -81,23 +81,17 @@ int main(void)
 
 			shader.Bind();
 			
-			ImGui::SliderFloat("Zoom", &zoom, 0.0f, 200.0f);
-			ImGui::SliderFloat3("Translation", &translation.x, -1000.0f, 1000.0f);
+			ImGui::SliderFloat3("Camera", &camera.x, -1000.0f, 1000.0f);
 
-			bool ortho = false;
-			glm::mat4 viewProj, transform;
-			if (ortho)
-			{
-				viewProj = glm::ortho(0.0f + zoom, 960.0f - zoom, 0.0f + (zoom * 540.0f / 960.0f), 540.0f - (zoom * 540.0f / 960.0f), -1.0f, 1.0f);
-				transform = glm::translate(glm::mat4(1.0f), translation);
-			}
-			else {
-				viewProj = glm::perspectiveFov(90.0f, 960.0f, 540.0f, 0.1f, 1000.0f);
-				transform = glm::translate(glm::mat4(1.0f), translation + glm::vec3(0,0,-150));
-			}
+			glm::mat4 viewProj;
+			const float radius = 100.0f;
+			float camX = sin(glfwGetTime()) * radius;
+			float camZ = cos(glfwGetTime()) * radius;
+			glm::mat4 view;
+			view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+			viewProj = glm::perspectiveFov(90.0f, 960.0f, 540.0f, 0.1f, 1000.0f) * view;
+			
 			shader.SetUniformMat4f("u_ViewProj", viewProj);
-			shader.SetUniformMat4f("u_Transform", transform);
-
 
 			Renderer::ResetStats();
 			Renderer::BeginBatch();
@@ -126,7 +120,7 @@ int main(void)
 			glm::vec3 boxPosition = { 0, 0, 0 };
 			glm::vec3 boxDimensions = { 50, 50, 50 };
 			glm::vec4 boxColor = { 0.1f, 0.2f, 0.8f, 1.0f };
-			glm::vec3 boxFacing = { 1, 1, 1 };
+			glm::vec3 boxFacing = { 0, 0, 1 };
 			Renderer::DrawBox(boxPosition, boxDimensions, boxColor, boxFacing);
 
 			Renderer::EndBatch();
