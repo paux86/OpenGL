@@ -46,6 +46,9 @@ int main(void)
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+
 		Shader shader("res/shaders/Basic.shader");
 
 		shader.Bind();
@@ -72,7 +75,7 @@ int main(void)
 		while (!glfwWindowShouldClose(window))
 		{
 			/* Render here */
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ImGui_ImplGlfwGL3_NewFrame();
 			ImGui::Begin("Test");
 
