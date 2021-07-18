@@ -13,6 +13,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -68,7 +70,6 @@ int main(void)
 		Texture texture1("res/textures/hero_dash_icon.png");
 		Texture texture2("res/textures/shield_with_cross_icon.png");
 
-		float zoom = 0.0f;
 		glm::vec3 camera(0, 0, 0);
 
 		/* Loop until the user closes the window */
@@ -85,37 +86,30 @@ int main(void)
 
 			glm::mat4 viewProj;
 			const float radius = 100.0f;
-			float camX = sin(glfwGetTime()) * radius;
-			float camZ = cos(glfwGetTime()) * radius;
+			//float camX = sin(glfwGetTime()) * radius;
+			//float camZ = cos(glfwGetTime()) * radius;
+			float camX = sin(camera.x) * radius;
+			float camZ = cos(camera.x) * radius;
+			
 			glm::mat4 view;
-			view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
+			// lookAt manual implementation
+			glm::vec3 camPosition = glm::vec3(camX, camera.y, camZ);
+			glm::vec3 camTarget = glm::vec3(0.0, 0.0, 0.0);
+			glm::vec3 camDirection = glm::normalize(camPosition - camTarget);
+			glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+			glm::vec3 camRight = glm::cross(up, camDirection);
+			glm::vec3 camUp = glm::cross(camDirection, camRight);
+			view = glm::mat4(glm::vec4(camRight, 0.0), glm::vec4(camUp, 0.0), glm::vec4(camDirection, 0.0), glm::vec4(glm::vec3(0.0), 1.0));
+			view = glm::transpose(view) * glm::mat4(glm::vec4(1.0, 0.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 0.0, 1.0, 0.0), glm::vec4(-camPosition, 1.0));
+
+			//view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 			viewProj = glm::perspectiveFov(90.0f, 960.0f, 540.0f, 0.1f, 1000.0f) * view;
 			
 			shader.SetUniformMat4f("u_ViewProj", viewProj);
 
 			Renderer::ResetStats();
 			Renderer::BeginBatch();
-
-			/*
-			float scale = 50.0f;
-			for (float y = -10.f; y < 10.0f; y += 0.25f)
-			{
-				for (float x = -10.f; x < 10.0f; x += 0.25f)
-				{
-					glm::vec4 color = { (x + 10) / 20.0f, 0.2f, (y + 10) / 20.0f, 1.0f };
-					Renderer::DrawQuad({ x*scale, y*scale }, { 0.25f*scale, 0.25f*scale }, color);
-				}
-			}
-
-			for (int y = 0; y < 5; y++)
-			{
-				for (int x = 0; x < 5; x++)
-				{
-					GLuint tex = (x + y) % 2 == 0 ? texture1.GetId() : texture2.GetId();
-					Renderer::DrawQuad({ x*scale, y*scale }, { 1.0f*scale, 1.0f*scale }, tex);
-				}
-			}
-			*/
 
 			glm::vec3 boxPosition = { 0, 0, 0 };
 			glm::vec3 boxDimensions = { 50, 50, 50 };
@@ -135,6 +129,23 @@ int main(void)
 
 			/* Poll for and process events */
 			glfwPollEvents();
+
+			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			{
+				camera.y++;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			{
+				camera.y--;
+			}
+			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			{
+				camera.x -= 0.1f;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			{
+				camera.x += 0.1f;
+			}
 		}
 		
 		Renderer::Shutdown();
