@@ -70,7 +70,9 @@ int main(void)
 		Texture texture1("res/textures/hero_dash_icon.png");
 		Texture texture2("res/textures/shield_with_cross_icon.png");
 
-		glm::vec3 camera(0, 0, 0);
+		glm::vec3 camera(0, 50, 0);
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
@@ -88,8 +90,8 @@ int main(void)
 			const float radius = 100.0f;
 			//float camX = sin(glfwGetTime()) * radius;
 			//float camZ = cos(glfwGetTime()) * radius;
-			float camX = sin(camera.x) * radius;
-			float camZ = cos(camera.x) * radius;
+			float camX = cos(camera.x) * radius;
+			float camZ = sin(camera.x) * radius;
 			
 			glm::mat4 view;
 
@@ -146,6 +148,14 @@ int main(void)
 			{
 				camera.x += 0.1f;
 			}
+
+			float sensitivity = 0.05f;
+			double newMouseX, newMouseY;
+			glfwGetCursorPos(window, &newMouseX, &newMouseY);
+			camera.y -= (newMouseY - mouseY);
+			camera.x += (newMouseX - mouseX) * sensitivity;
+			mouseX = newMouseX;
+			mouseY = newMouseY;
 		}
 		
 		Renderer::Shutdown();

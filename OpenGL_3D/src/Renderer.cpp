@@ -133,7 +133,7 @@ void Renderer::Flush()
 
 void Renderer::DrawQuad(const glm::vec2 & position, const glm::vec2 & size, const glm::vec4 & color)
 {
-	if (s_Data.IndexCount >= MaxIndexCount)
+	if (s_Data.IndexCount + 6 >= MaxIndexCount)
 	{
 		EndBatch();
 		Flush();
@@ -173,7 +173,7 @@ void Renderer::DrawQuad(const glm::vec2 & position, const glm::vec2 & size, cons
 
 void Renderer::DrawQuad(const glm::vec2 & position, const glm::vec2 & size, uint32_t textureID)
 {
-	if (s_Data.IndexCount >= MaxIndexCount || s_Data.TextureSlotIndex > (MaxTextures - 1))
+	if (s_Data.IndexCount + 6 >= MaxIndexCount || s_Data.TextureSlotIndex > (MaxTextures - 1))
 	{
 		EndBatch();
 		Flush();
@@ -232,7 +232,7 @@ void Renderer::DrawBox(const glm::vec3& position, const glm::vec3& size, const g
 	// Should leave this a 2d quad renderer and create a second 3d renderer
 	// Forcing this here is doubling the number of verticies used vs required
 	
-	if (s_Data.IndexCount >= MaxIndexCount)
+	if (s_Data.IndexCount + 36 >= MaxIndexCount)
 	{
 		EndBatch();
 		Flush();

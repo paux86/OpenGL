@@ -23,6 +23,7 @@
     <ProjectGuid>{5CBEB006-82D8-4E78-B7C1-F9628E377928}</ProjectGuid>
     <RootNamespace>OpenGL3D</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>OpenGL_3D</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
