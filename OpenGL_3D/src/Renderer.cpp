@@ -16,6 +16,7 @@ struct Vertex
 	glm::vec4 Color;
 	glm::vec2 TexCoords;
 	float TexIndex;
+	glm::vec3 Normal;
 };
 
 struct RendererData
@@ -60,6 +61,9 @@ void Renderer::Init()
 
 	glEnableVertexArrayAttrib(s_Data.QuadVA, 3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, TexIndex));
+
+	glEnableVertexArrayAttrib(s_Data.QuadVA, 4);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, Normal));
 
 	uint32_t indices[MaxIndexCount];
 	uint32_t offset = 0;
@@ -250,173 +254,203 @@ void Renderer::DrawBox(const glm::vec3& position, const glm::vec3& size, const g
 	glm::vec3 frontBottomLeftPosition = position + (v_facing_norm * size.x * 0.5f) - (v_right * size.y * 0.5f) - (v_up * size.z * 0.5f);
 	
 	// front quad
+	glm::vec3 frontNormal = glm::cross(v_right, v_up);
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition;
 	s_Data.QuadBufferPtr->Color = color;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = frontNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = color;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = frontNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y) + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = color;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = frontNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = color;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = frontNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.IndexCount += 6;
 	s_Data.RendererStats.QuadCount++;
 	
 	// back quad
+	glm::vec3 backNormal = glm::cross(v_right, -v_up);
 	glm::vec4 backColor = { 0.8f, 0.1f, 0.2f, 1.0f };
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x);
 	s_Data.QuadBufferPtr->Color = backColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = backNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y) - (v_facing_norm * size.x);
 	s_Data.QuadBufferPtr->Color = backColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = backNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y) + (v_up * size.z) - (v_facing_norm * size.x);
 	s_Data.QuadBufferPtr->Color = backColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = backNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_up * size.z) - (v_facing_norm * size.x);
 	s_Data.QuadBufferPtr->Color = backColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = backNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.IndexCount += 6;
 	s_Data.RendererStats.QuadCount++;
 	
 	// left quad
+	glm::vec3 leftNormal = glm::cross(v_facing_norm, v_up);
 	glm::vec4 leftColor = { 0.4f, 0.6f, 0.2f, 1.0f };
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition;
 	s_Data.QuadBufferPtr->Color = leftColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = leftNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x);
 	s_Data.QuadBufferPtr->Color = leftColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = leftNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x) + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = leftColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = leftNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = leftColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = leftNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.IndexCount += 6;
 	s_Data.RendererStats.QuadCount++;
 	
 	// right quad
+	glm::vec3 rightNormal = glm::cross(v_facing_norm, -v_up);
 	glm::vec4 rightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = rightColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = rightNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x) + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = rightColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = rightNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x) + (v_up * size.z) + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = rightColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = rightNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_up * size.z) + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = rightColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = rightNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.IndexCount += 6;
 	s_Data.RendererStats.QuadCount++;
 	
 	// bottom quad
+	glm::vec3 bottomNormal = glm::cross(v_right, v_facing_norm);
 	glm::vec4 bottomColor = { 0.0f, 1.0f, 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition;
 	s_Data.QuadBufferPtr->Color = bottomColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = bottomNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x);
 	s_Data.QuadBufferPtr->Color = bottomColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = bottomNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x) + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = bottomColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = bottomNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y);
 	s_Data.QuadBufferPtr->Color = bottomColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = bottomNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.IndexCount += 6;
 	s_Data.RendererStats.QuadCount++;
 
 	// top quad
+	glm::vec3 topNormal = glm::cross(v_facing_norm, v_right);
 	glm::vec4 topColor = { 1.0f, 0.0f, 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = topColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = topNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x) + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = topColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = topNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition - (v_facing_norm * size.x) + (v_right * size.y) + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = topColor;
 	s_Data.QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = topNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.QuadBufferPtr->Position = frontBottomLeftPosition + (v_right * size.y) + (v_up * size.z);
 	s_Data.QuadBufferPtr->Color = topColor;
 	s_Data.QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 	s_Data.QuadBufferPtr->TexIndex = textureIndex;
+	s_Data.QuadBufferPtr->Normal = topNormal;
 	s_Data.QuadBufferPtr++;
 
 	s_Data.IndexCount += 6;
