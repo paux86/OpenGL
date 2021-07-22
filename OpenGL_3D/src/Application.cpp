@@ -109,6 +109,7 @@ int main(void)
 			viewProj = glm::perspectiveFov(90.0f, 960.0f, 540.0f, 0.1f, 1000.0f) * view;
 			
 			shader.SetUniformMat4f("u_ViewProj", viewProj);
+			shader.SetUniform3f("u_ViewPos", camPosition.x, camPosition.y, camPosition.z);
 
 			Renderer::ResetStats();
 			Renderer::BeginBatch();

@@ -37,6 +37,7 @@ in vec3 v_FragPos;
 in vec3 v_Normal;
 
 uniform sampler2D u_Textures[32];
+uniform vec3 u_ViewPos;
 
 void main()
 {
@@ -45,11 +46,17 @@ void main()
 	vec3 ambient = ambientStrength * lightColor;
 
 	vec3 norm = normalize(v_Normal);
-	vec3 lightDir = normalize(vec3(50, 100, 100) - v_FragPos);
+	vec3 lightDir = normalize(vec3(20, 70, 100) - v_FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor;
 
+	float specularStrength = 0.5;
+	vec3 viewDir = normalize(u_ViewPos - v_FragPos);
+	vec3 reflectDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	vec3 specular = specularStrength * spec * lightColor;
+
 	int index = int(v_TexIndex);
 	vec4 result = texture(u_Textures[index], v_TexCoord) * v_Color;
-	o_Color = vec4(ambient + diffuse, 1.0) * result;
+	o_Color = vec4(ambient + diffuse + specular, 1.0) * result;
 };
